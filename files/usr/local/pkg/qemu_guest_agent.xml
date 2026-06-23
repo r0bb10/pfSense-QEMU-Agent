@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<name>qemu-guest-agent</name>
+	<version>%%PKGVERSION%%</version>
+	<title>Services: QEMU Guest Agent</title>
+	<addedit_string>QEMU Guest Agent: changed settings</addedit_string>
+	<include_file>/usr/local/pkg/qemu-guest-agent.inc</include_file>
+	<configpath>installedpackages->qemuguestagent->config</configpath>
+	<aftersaveredirect>/pkg_edit.php?xml=qemu-guest-agent.xml</aftersaveredirect>
+	<service>
+		<name>qemu-ga</name>
+		<rcfile>qemu-guest-agent</rcfile>
+		<executable>qemu-ga</executable>
+		<description>Proxmox Guest Agent</description>
+	</service>
+	<menu>
+		<name>QEMU Guest Agent</name>
+		<section>Services</section>
+		<configfile>qemu-guest-agent.xml</configfile>
+		<url>/pkg_edit.php?xml=qemu-guest-agent.xml</url>
+	</menu>
+	<menu>
+		<name>QEMU Guest Agent</name>
+		<section>Status</section>
+		<configfile>qemu-guest-agent.xml</configfile>
+		<url>/status_qemu_guest_agent.php</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=qemu-guest-agent.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Status</text>
+			<url>/status_qemu_guest_agent.php</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>Service</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Start the Proxmox Guest Agent at boot and keep the service running.</description>
+			<type>checkbox</type>
+		</field>
+	</fields>
+	<custom_php_install_command>qemu_guest_agent_install();</custom_php_install_command>
+	<custom_php_deinstall_command>qemu_guest_agent_deinstall();</custom_php_deinstall_command>
+	<custom_php_resync_config_command>qemu_guest_agent_sync();</custom_php_resync_config_command>
+</packagegui>

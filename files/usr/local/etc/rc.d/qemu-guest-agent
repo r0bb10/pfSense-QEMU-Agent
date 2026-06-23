@@ -1,0 +1,21 @@
+#!/bin/sh
+# shellcheck disable=SC1091,SC2034
+
+# PROVIDE: qemu_guest_agent
+# REQUIRE: DAEMON
+# KEYWORD: nojail
+
+. /etc/rc.subr
+
+name="qemu_guest_agent"
+rcvar="qemu_guest_agent_enable"
+
+load_rc_config "${name}"
+
+: "${qemu_guest_agent_enable:=NO}"
+: "${qemu_guest_agent_flags:=-d -v -l /var/log/qemu-ga.log}"
+
+command="/usr/local/bin/qemu-ga"
+pidfile="/var/run/qemu-ga.pid"
+
+run_rc_command "$1"

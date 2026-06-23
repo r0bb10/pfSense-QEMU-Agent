@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.0
+      - name: Shell lint
+        run: shellcheck build.sh scripts/fetch-freebsd-qemu-guest-agent.sh files/pkg-install.in files/pkg-deinstall.in files/usr/local/etc/rc.d/qemu-guest-agent
+      - name: PHP lint
+        run: find files -type f \( -name '*.php' -o -name '*.inc' \) -print0 | xargs -0 -n1 php -l
+      - name: XML parse
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import xml.etree.ElementTree as ET
+          for path in pathlib.Path('files').rglob('*.xml'):
+              ET.parse(path)
+              print(path)
+          PY
+      - name: Build script missing binary guard
+        run: |
+          if ./build.sh stage 2>/tmp/build.err; then
+            echo 'build.sh unexpectedly succeeded without dist/qemu-ga' >&2
+            exit 1
+          fi
+          grep -q 'Missing FreeBSD/amd64 binary' /tmp/build.err
+
+  freebsd-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.0
+      - name: Fetch FreeBSD qemu-ga
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zstd
+          chmod +x scripts/fetch-freebsd-qemu-guest-agent.sh
+          ./scripts/fetch-freebsd-qemu-guest-agent.sh
+      - name: Build package on FreeBSD 15
+        uses: vmactions/freebsd-vm@v1.4.8
+        with:
+          release: '15.0'
+          usesh: true
+          prepare: |
+            export ASSUME_ALWAYS_YES=yes
+            pkg bootstrap -f
+          run: |
+            set -eux
+            chmod +x build.sh
+            version=$(cat dist/VERSION)
+            PORTVERSION="${version}" ./build.sh package
+            cp build/pkg/*.pkg ./pfSense-pkg-qemu-guest-agent-${version}.pkg
+            sha256 pfSense-pkg-qemu-guest-agent-${version}.pkg > SHA256SUMS
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: pfSense-pkg-qemu-guest-agent
+          path: |
+            pfSense-pkg-qemu-guest-agent-*.pkg
+            SHA256SUMS

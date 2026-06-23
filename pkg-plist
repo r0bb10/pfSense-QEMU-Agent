@@ -1,0 +1,11 @@
+/etc/inc/priv/qemu_guest_agent.priv.inc
+bin/qemu-ga
+etc/rc.d/qemu-guest-agent
+pkg/qemu-guest-agent.inc
+pkg/qemu-guest-agent.xml
+%%DATADIR%%/info.xml
+www/shortcuts/pkg_qemu_guest_agent.inc
+www/status_qemu_guest_agent.php
+www/widgets/widgets/qemu_guest_agent.widget.php
+@dir /etc/inc/priv
+@dir /etc/inc

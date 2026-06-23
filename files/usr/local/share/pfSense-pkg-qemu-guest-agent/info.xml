@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pfsensepkgs>
+	<package>
+		<name>QEMU Guest Agent</name>
+		<internal_name>qemu-guest-agent</internal_name>
+		<descr><![CDATA[Proxmox Guest Agent for pfSense.]]></descr>
+		<pkginfolink>https://github.com/r0bb10/pfSense-QEMU-Agent</pkginfolink>
+		<version>%%PKGVERSION%%</version>
+		<configurationfile>qemu-guest-agent.xml</configurationfile>
+	</package>
+</pfsensepkgs>

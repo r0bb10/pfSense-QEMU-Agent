@@ -1,0 +1,3 @@
+Proxmox QEMU Guest Agent package for pfSense.
+
+This package bundles the FreeBSD qemu-ga binary and provides pfSense WebGUI service integration, status visibility, and a dashboard widget.
