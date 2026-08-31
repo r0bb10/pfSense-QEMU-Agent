@@ -1,13 +1,12 @@
 name: Track FreeBSD and Release
 
 on:
-  push:
-    branches: [main]
   schedule:
     - cron: '43 */12 * * *'
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   id-token: write
   attestations: write
@@ -17,7 +16,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.fetch.outputs.version }}
+      release_exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v7.0.0
+      - name: Fetch FreeBSD qemu-ga
+        id: fetch
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zstd
+          chmod +x scripts/fetch-freebsd-qemu-guest-agent.sh
+          ./scripts/fetch-freebsd-qemu-guest-agent.sh
+          version=$(cat dist/VERSION)
+          printf 'version=%s\n' "${version}" >> "$GITHUB_OUTPUT"
+      - name: Check existing package release
+        id: check
+        uses: actions/github-script@v8
+        env:
+          RELEASE_TAG: ${{ steps.fetch.outputs.version }}
+        with:
+          script: |
+            try {
+              await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: process.env.RELEASE_TAG
+              });
+              core.setOutput('exists', 'true');
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              core.setOutput('exists', 'false');
+            }
+
   build:
+    if: needs.prepare.outputs.release_exists == 'false' || github.event_name == 'workflow_dispatch'
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.0
@@ -40,52 +76,52 @@ jobs:
             set -eux
             chmod +x build.sh
             version=$(cat dist/VERSION)
+            test "${version}" = '${{ needs.prepare.outputs.version }}'
             printf '%s\n' "${version}" > .freebsd-qga-version
             PORTVERSION="${version}" ./build.sh package
             cp build/pkg/*.pkg ./pfSense-pkg-qemu-guest-agent-${version}.pkg
-            sha256 pfSense-pkg-qemu-guest-agent-${version}.pkg > SHA256SUMS
-      - name: Read built version
-        id: version
-        run: printf 'version=%s\n' "$(cat .freebsd-qga-version)" >> "$GITHUB_OUTPUT"
-      - name: Check existing package release
-        id: check
-        uses: actions/github-script@v8
-        env:
-          RELEASE_TAG: pfsense-${{ steps.version.outputs.version }}
-        with:
-          script: |
-            try {
-              await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag: process.env.RELEASE_TAG
-              });
-              core.setOutput('exists', 'true');
-            } catch (error) {
-              if (error.status !== 404) throw error;
-              core.setOutput('exists', 'false');
-            }
       - name: Attest package
-        if: steps.check.outputs.exists == 'false' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         uses: actions/attest-build-provenance@v4.1.0
         with:
-          subject-path: pfSense-pkg-qemu-guest-agent-${{ steps.version.outputs.version }}.pkg
+          subject-path: pfSense-pkg-qemu-guest-agent-${{ needs.prepare.outputs.version }}.pkg
       - uses: actions/upload-artifact@v7.0.1
-        if: steps.check.outputs.exists == 'false' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         with:
-          name: pfSense-pkg-qemu-guest-agent-${{ steps.version.outputs.version }}
-          path: |
-            pfSense-pkg-qemu-guest-agent-${{ steps.version.outputs.version }}.pkg
-            SHA256SUMS
+          name: pfSense-pkg-qemu-guest-agent-${{ needs.prepare.outputs.version }}
+          path: pfSense-pkg-qemu-guest-agent-${{ needs.prepare.outputs.version }}.pkg
       - name: Publish GitHub release
-        if: steps.check.outputs.exists == 'false' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         uses: softprops/action-gh-release@v3.0.1
         with:
-          tag_name: pfsense-${{ steps.version.outputs.version }}
-          name: pfSense QEMU Guest Agent ${{ steps.version.outputs.version }}
+          tag_name: ${{ needs.prepare.outputs.version }}
+          name: ${{ needs.prepare.outputs.version }}
           body: |
-            pfSense package for official QEMU Guest Agent ${{ steps.version.outputs.version }}, packaged from the FreeBSD 15 amd64 binary release.
+            pfSense package for official QEMU Guest Agent ${{ needs.prepare.outputs.version }}, packaged from the FreeBSD 15 amd64 binary release.
           overwrite_files: true
-          files: |
-            pfSense-pkg-qemu-guest-agent-${{ steps.version.outputs.version }}.pkg
-            SHA256SUMS
+          files: pfSense-pkg-qemu-guest-agent-${{ needs.prepare.outputs.version }}.pkg
+
+  cleanup:
+    if: always() && needs.prepare.result == 'success'
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retain one previous run
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'release.yml',
+              status: 'completed',
+              per_page: 100
+            });
+            const previousRuns = runs
+              .filter((run) => run.id !== context.runId)
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            for (const run of previousRuns.slice(1)) {
+              await github.rest.actions.deleteWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: run.id
+              });
+            }
