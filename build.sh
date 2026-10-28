@@ -24,7 +24,7 @@ json_escape() {
 stage() {
 	if [ ! -x "${BINARY}" ]; then
 		echo "Missing FreeBSD/amd64 binary: ${BINARY}" >&2
-		echo "Run scripts/fetch-freebsd-qemu-guest-agent.sh or place qemu-ga at dist/qemu-ga." >&2
+		echo "Run scripts/build-qemu-ga-freebsd.sh <qemu-version> in the FreeBSD build VM first." >&2
 		exit 1
 	fi
 

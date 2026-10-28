@@ -2,12 +2,12 @@
 
 pfSense package for the Proxmox QEMU Guest Agent (`qemu-ga`) on pfSense 2.8.x.
 
-This package bundles the `qemu-ga` binary from the FreeBSD 15 latest `qemu-guest-agent`
-package and adds pfSense WebGUI, service, and dashboard widget integration.
+This package builds `qemu-ga` from official QEMU sources and adds pfSense WebGUI,
+service, and dashboard widget integration.
 
 ## Scope
 
-- Track FreeBSD 15 amd64 latest `qemu-guest-agent` packages.
+- Track stable upstream QEMU releases from `https://download.qemu.org/`.
 - Package `/usr/local/bin/qemu-ga` as `pfSense-pkg-qemu-guest-agent`.
 - Provide a pfSense rc.d service.
 - Provide GUI-based enable/disable configuration.

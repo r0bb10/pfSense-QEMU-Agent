@@ -236,9 +236,9 @@ function qemu_guest_agent_update_launch($action, $check_id = '', $automatic = fa
 			throw new RuntimeException('An update operation is already queued.', 409);
 		}
 		$installed = qemu_guest_agent_version();
-		if ($automatic && ((($state['action'] ?? '') === 'install' && ($state['status'] ?? '') === 'error') ||
-			(in_array($state['status'] ?? '', ['available', 'current'], true) &&
-			($state['installed'] ?? '') === $installed && time() - ($state['checked_at'] ?? 0) < 900))) {
+		// Cache successful checks only. Reopening the page retries failed operations.
+		if ($automatic && in_array($state['status'] ?? '', ['available', 'current'], true) &&
+			($state['installed'] ?? '') === $installed && time() - ($state['checked_at'] ?? 0) < 900) {
 			return;
 		}
 		if ($action === 'install' && (($state['status'] ?? '') !== 'available' || !is_string($check_id) || $check_id === '' ||

@@ -1,0 +1,35 @@
+{
+  "version": "2.8.1",
+  "abi": "FreeBSD:15:amd64",
+  "osversion": 1500029,
+  "headers_repository": "https://github.com/freebsd/freebsd-src.git",
+  "headers_revision": "46297859a74563dde6fc5bff9f9ecded9fb61ba6",
+  "packages": [
+    {
+      "name": "pfSense-base-2.8.1.pkg",
+      "url": "https://files00.netgate.com/pfSense_v2_8_1_amd64-core/All/pfSense-base-2.8.1.pkg",
+      "sha256": "6be13185f800d4a0949d30057af1c005264a107fe776c0fd751447b21cf296c0",
+      "base": true
+    },
+    {
+      "name": "glib-2.80.5_1,2.pkg",
+      "url": "https://files00.netgate.com/pfSense_v2_8_1_amd64-pfSense_v2_8_1/All/glib-2.80.5_1,2.pkg",
+      "sha256": "ab6186dc1350c2710732f61b1d6b442f7ebd5872dfe796019c3cd707104a9105"
+    },
+    {
+      "name": "gettext-runtime-0.22.5.pkg",
+      "url": "https://files00.netgate.com/pfSense_v2_8_1_amd64-pfSense_v2_8_1/All/gettext-runtime-0.22.5.pkg",
+      "sha256": "6e0c909601db7958403498706f3cd44ffe8cb81ef1458e7591f5b4f4629beb74"
+    },
+    {
+      "name": "libiconv-1.17_1.pkg",
+      "url": "https://files00.netgate.com/pfSense_v2_8_1_amd64-pfSense_v2_8_1/All/libiconv-1.17_1.pkg",
+      "sha256": "0eb9b2120f6565e11209768171bb7e9ab322d94cc940291d9a5667c6ea77df22"
+    },
+    {
+      "name": "pcre2-10.43.pkg",
+      "url": "https://files00.netgate.com/pfSense_v2_8_1_amd64-pfSense_v2_8_1/All/pcre2-10.43.pkg",
+      "sha256": "e0bb9689fd4ddc10df876e773d83b314d04778d9e0630aeca1a65b94389c0e14"
+    }
+  ]
+}
