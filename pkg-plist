@@ -3,9 +3,11 @@ bin/qemu-ga
 etc/rc.d/qemu-guest-agent
 pkg/qemu-guest-agent.inc
 pkg/qemu-guest-agent.xml
+pkg/qemu_guest_agent_update.inc
+pkg/qemu_guest_agent_update.php
 %%DATADIR%%/info.xml
 www/shortcuts/pkg_qemu_guest_agent.inc
-www/status_qemu_guest_agent.php
+www/qemu_guest_agent.php
 www/widgets/widgets/qemu_guest_agent.widget.php
 @dir /etc/inc/priv
 @dir /etc/inc

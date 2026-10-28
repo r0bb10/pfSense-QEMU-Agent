@@ -24,7 +24,7 @@ if ! command -v unzstd >/dev/null 2>&1; then
 	exit 1
 fi
 
-rm -f "${DIST}/${PKGNAME}-"*.pkg "${DIST}/qemu-ga" "${DIST}/VERSION" "${PACKAGESITE}" "${PACKAGESITE_YAML}"
+rm -f "${DIST}/${PKGNAME}-"*.pkg "${DIST}/qemu-ga" "${DIST}/VERSION" "${DIST}/FREEBSD_VERSION" "${PACKAGESITE}" "${PACKAGESITE_YAML}"
 
 curl -fsSL "${FREEBSD_PACKAGE_SITE}/packagesite.pkg" -o "${PACKAGESITE}"
 tar --use-compress-program=unzstd -xOf "${PACKAGESITE}" packagesite.yaml > "${PACKAGESITE_YAML}"
@@ -62,6 +62,6 @@ else
 	exit 1
 fi
 chmod 0755 "${DIST}/qemu-ga"
-printf '%s\n' "${version}" > "${DIST}/VERSION"
+printf '%s\n' "${version}" > "${DIST}/FREEBSD_VERSION"
 
 echo "${version}"

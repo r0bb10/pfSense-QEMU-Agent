@@ -8,7 +8,7 @@
 	<addedit_string>QEMU Guest Agent: changed settings</addedit_string>
 	<include_file>/usr/local/pkg/qemu-guest-agent.inc</include_file>
 	<configpath>installedpackages->qemuguestagent->config</configpath>
-	<aftersaveredirect>/pkg_edit.php?xml=qemu-guest-agent.xml</aftersaveredirect>
+	<aftersaveredirect>/qemu_guest_agent.php</aftersaveredirect>
 	<service>
 		<name>qemu-ga</name>
 		<rcfile>qemu-guest-agent</rcfile>
@@ -19,25 +19,8 @@
 		<name>QEMU Guest Agent</name>
 		<section>Services</section>
 		<configfile>qemu-guest-agent.xml</configfile>
-		<url>/pkg_edit.php?xml=qemu-guest-agent.xml</url>
+		<url>/qemu_guest_agent.php</url>
 	</menu>
-	<menu>
-		<name>QEMU Guest Agent</name>
-		<section>Status</section>
-		<configfile>qemu-guest-agent.xml</configfile>
-		<url>/status_qemu_guest_agent.php</url>
-	</menu>
-	<tabs>
-		<tab>
-			<text>Settings</text>
-			<url>/pkg_edit.php?xml=qemu-guest-agent.xml</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>Status</text>
-			<url>/status_qemu_guest_agent.php</url>
-		</tab>
-	</tabs>
 	<fields>
 		<field>
 			<name>Service</name>
@@ -46,7 +29,7 @@
 		<field>
 			<fielddescr>Enable</fielddescr>
 			<fieldname>enable</fieldname>
-			<description>Start the Proxmox Guest Agent at boot and keep the service running.</description>
+			<description>Start QEMU Guest Agent at boot.</description>
 			<type>checkbox</type>
 		</field>
 	</fields>

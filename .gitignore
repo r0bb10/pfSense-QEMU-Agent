@@ -1,5 +1,2 @@
 .dev/
-build/
-dist/
-*.pkg
-SHA256SUMS
+tests/

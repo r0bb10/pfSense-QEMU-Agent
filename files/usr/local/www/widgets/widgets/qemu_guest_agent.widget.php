@@ -57,7 +57,7 @@ if (isset($_POST['ajax'])) {
 	</table>
 </div>
 <div class="text-right">
-	<a href="/status_qemu_guest_agent.php"><?=gettext('Full status')?></a>
+	<a href="/qemu_guest_agent.php"><?=gettext('QEMU Guest Agent')?></a>
 </div>
 
 <script type="text/javascript">
